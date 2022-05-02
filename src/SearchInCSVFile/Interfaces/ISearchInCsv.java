@@ -1,5 +1,13 @@
 package SearchInCSVFile.Interfaces;
 
+import java.io.IOException;
+
+import Main.ActiveThread;
+
 public interface ISearchInCsv {
-	void searchInCsv(String pathInputFile, String pathOutputFile, String incode, String columName, String expression);
+	String getPathInput();
+	String getPathOutput();
+	String getIncode();
+	void searchInCsv(String columnName,	String expression, ActiveThread active)
+			throws IOException;
 }

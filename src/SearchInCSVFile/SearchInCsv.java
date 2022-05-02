@@ -1,35 +1,59 @@
 package SearchInCSVFile;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import Main.ActiveThread;
 import SearchInCSVFile.Interfaces.ISearchInCsv;
 
-public class SearchInCsv implements ISearchInCsv {
-
+public class SearchInCsv implements ISearchInCsv{
+	private final String _pathInput;
+	private final String _pathOutput;
+	private final String _incode;
+	public SearchInCsv(String pathInput, String pathOutput, String incode) {
+		_pathInput = pathInput;
+		_pathOutput = pathOutput;
+		_incode = incode;
+	}
+	
+	public String getPathInput() {
+		return _pathInput;
+	}
+	public String getPathOutput() {
+		return _pathOutput;
+	}
+	public String getIncode() {
+		return _incode;
+	}
+	
 	@Override
-	public void searchInCsv(String pathInputFile, String pathOutputFile, String incode, String columnName,
-			String expression) {
-		try(var scanner = new Scanner(new File(pathInputFile)))
+	public void searchInCsv(String columnName, String expression, ActiveThread active) throws IOException {
+		try(var scanner = new Scanner(new File(_pathInput)))
 		{
-			var lineNumber = 0;
+			var isHeader = true;
+			var columnNumbers = new ArrayList<Integer>();
 			while (scanner.hasNextLine()) {
+				if (!active.getIsActive())
+					return;
 				var line = scanner.nextLine();
-				if (lineNumber == 0) {
-					var columnNumbers = getColumnNumbers(line, columnName);
+				if (isHeader) {
+					writeResult(line, false);
+					columnNumbers = getColumnNumbers(line, columnName);
+					isHeader = false;
+					continue;
 				}
-				else {
-					
+				
+				if (isContent(line, columnNumbers, expression)) {
+					writeResult(line, true);
 				}
-				lineNumber++;
 			}
 		}
 		catch(IOException ex){
-            
-            System.out.println(ex.getMessage());
+			throw ex;
         } 
 	}
 	
@@ -43,5 +67,26 @@ public class SearchInCsv implements ISearchInCsv {
 			}
 		}
 		return columnNumbers;
+	}
+	
+	private boolean isContent(String line, ArrayList<Integer> columnNumbers, String expression) {
+		var values = line.split(";");
+		for (var item : columnNumbers) {
+			if (values[item].equals(expression)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private void writeResult(String line, boolean append) throws IOException {
+		try(FileWriter writer = new FileWriter(_pathOutput, append))
+        {
+            writer.write(line);
+            writer.flush();
+        }
+        catch(IOException ex){
+        	throw ex;
+        }		
 	}
 }
