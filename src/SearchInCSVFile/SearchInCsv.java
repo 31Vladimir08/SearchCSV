@@ -1,11 +1,8 @@
 package SearchInCSVFile;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
 
 import Main.ActiveThread;
 import SearchInCSVFile.Interfaces.ISearchInCsv;
@@ -13,11 +10,11 @@ import SearchInCSVFile.Interfaces.ISearchInCsv;
 public class SearchInCsv implements ISearchInCsv{
 	private final String _pathInput;
 	private final String _pathOutput;
-	private final String _incode;
-	public SearchInCsv(String pathInput, String pathOutput, String incode) {
+	private final Charset _encode;
+	public SearchInCsv(String pathInput, String pathOutput, Charset encode) {
 		_pathInput = pathInput;
 		_pathOutput = pathOutput;
-		_incode = incode;
+		_encode = encode;
 	}
 	
 	public String getPathInput() {
@@ -27,12 +24,12 @@ public class SearchInCsv implements ISearchInCsv{
 		return _pathOutput;
 	}
 	public String getIncode() {
-		return _incode;
+		return _encode.displayName();
 	}
 	
 	@Override
 	public void searchInCsv(String columnName, String expression, ActiveThread active) throws IOException {
-		try(var scanner = new Scanner(new File(_pathInput)))
+		try(var scanner = new Scanner(new File(_pathInput), _encode))
 		{
 			var isHeader = true;
 			var columnNumbers = new ArrayList<Integer>();
@@ -80,7 +77,7 @@ public class SearchInCsv implements ISearchInCsv{
 	}
 	
 	private void writeResult(String line, boolean append) throws IOException {
-		try(FileWriter writer = new FileWriter(_pathOutput, append))
+		try(FileWriter writer = new FileWriter(line, _encode, append))
         {
             writer.write(line);
             writer.flush();

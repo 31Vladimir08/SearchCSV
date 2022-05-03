@@ -1,6 +1,7 @@
 package SearchInCSVFile;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import Main.ActiveThread;
 
@@ -13,10 +14,10 @@ public class SearchInCsvThread implements Runnable {
 	public SearchInCsvThread(
 			String pathInput,
 			String pathOutput,
-			String incode,
+			Charset encode,
 			String columnName,
 			String expression) {
-		_searchInCsv = new SearchInCsv(pathInput, pathOutput, incode);
+		_searchInCsv = new SearchInCsv(pathInput, pathOutput, encode);
 		_columnName = columnName;
 		_expression = expression;
 		_active = new ActiveThread();
