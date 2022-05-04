@@ -29,6 +29,8 @@ public class SearchInCsv implements ISearchInCsv{
 	
 	@Override
 	public void searchInCsv(String columnName, String expression, ActiveThread active) throws IOException {
+		if (_encode == null)
+			throw new IOException("You inputed incorrect incode.");
 		try(var scanner = new Scanner(new File(_pathInput), _encode))
 		{
 			var isHeader = true;
@@ -58,9 +60,9 @@ public class SearchInCsv implements ISearchInCsv{
 		var columnNumbers = new ArrayList<Integer>();
 		var columns = header.split(";");
 		for (var item : columns) {
-			var colName = item.split(" ")[1];
+			var colName = item.split(" ")[0];
 			if (colName.equals(columnName)) {
-				columnNumbers.add(Arrays.asList(colName).indexOf(item));
+				columnNumbers.add(Arrays.asList(columns).indexOf(item));
 			}
 		}
 		return columnNumbers;
@@ -77,9 +79,13 @@ public class SearchInCsv implements ISearchInCsv{
 	}
 	
 	private void writeResult(String line, boolean append) throws IOException {
-		try(FileWriter writer = new FileWriter(line, _encode, append))
+		try(FileWriter writer = new FileWriter(_pathOutput, _encode, append))
         {
-            writer.write(line);
+			if (append) {
+				writer.append('\r');
+            	writer.append('\n');
+            }
+            writer.write(line);            
             writer.flush();
         }
         catch(IOException ex){
