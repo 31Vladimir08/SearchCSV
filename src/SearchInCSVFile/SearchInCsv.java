@@ -28,9 +28,7 @@ public class SearchInCsv implements ISearchInCsv{
 	}
 	
 	@Override
-	public void searchInCsv(String columnName, String expression, ActiveThread active) throws IOException {
-		if (_encode == null)
-			throw new IOException("You inputed incorrect incode.");
+	public void searchInCsv(String columnName, String expression, ActiveThread active) throws Exception {
 		try(var scanner = new Scanner(new File(_pathInput), _encode))
 		{
 			var isHeader = true;
@@ -53,7 +51,7 @@ public class SearchInCsv implements ISearchInCsv{
 		}
 		catch(IOException ex){
 			throw ex;
-        } 
+        }
 	}
 	
 	private ArrayList<Integer> getColumnNumbers(String header, String columnName){
